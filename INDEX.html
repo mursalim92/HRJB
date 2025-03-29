@@ -289,7 +289,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            font-size: 10px;
+            font-size: 14px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
@@ -318,7 +318,6 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: 500;
-            min-width: 60px;
         }
         
         .status-hadir {
@@ -337,13 +336,6 @@
             background-color: rgba(217, 83, 79, 0.2);
             color: var(--danger);
             border: 1px solid var(--danger);
-        }
-        
-        .status-number {
-            background-color: rgba(44, 78, 58, 0.1);
-            color: var(--primary);
-            border: 1px solid var(--primary);
-            font-weight: bold;
         }
         
         .status-lembur::after {
@@ -653,19 +645,10 @@
                                                     return '<td>-</td>';
                                                 }
                                                 
-                                                // Check if the value is a number (integer or decimal)
-                                                if (/^[0-9]*\.?[0-9]+$/.test(cellValue)) {
-                                                    // Format as decimal with exactly 1 decimal place
-                                                    const numValue = parseFloat(cellValue);
-                                                    if (!isNaN(numValue)) {
-                                                        displayText = numValue.toFixed(1); // Always show 1 decimal place
-                                                        className = 'status-number';
-                                                    }
-                                                } 
-                                                else if (lowerValue.includes('hadir')) {
+                                                // Apply status classes but keep original text formatting
+                                                if (lowerValue.includes('hadir')) {
                                                     className = 'status-hadir';
                                                     if (lowerValue.includes('jam')) {
-                                                        displayText = 'Hadir';
                                                         className += ' status-lembur';
                                                     }
                                                 } else if (lowerValue.includes('izin')) {
