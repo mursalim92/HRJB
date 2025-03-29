@@ -1,112 +1,155 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Absensi Karyawan</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Your existing CSS styles here */
-        .loading { display: flex; justify-content: center; padding: 40px; }
-        .spinner { width: 40px; height: 40px; border: 4px solid rgba(66, 133, 244, 0.1); border-radius: 50%; border-top-color: #4285f4; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .error-message { text-align: center; padding: 20px; color: #ea4335; background-color: rgba(234, 67, 53, 0.1); border-radius: 8px; margin-top: 20px; }
-        .employee-card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
-        .attendance-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-        .attendance-table th { background-color: #4285f4; color: white; padding: 12px; text-align: center; }
-        .attendance-table td { padding: 10px; text-align: center; border-bottom: 1px solid #e0e0e0; }
-        .status-hadir { background-color: rgba(52, 168, 83, 0.1); color: #34a853; }
-        .status-izin { background-color: rgba(251, 188, 5, 0.1); color: #fbbc05; }
-        .status-alpha { background-color: rgba(234, 67, 53, 0.1); color: #ea4335; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <input type="text" id="nikInput" placeholder="Masukkan NIK">
-        <button onclick="loadData()">Cari</button>
-        <div id="resultContainer"></div>
-    </div>
-
-    <script>
-        async function loadData() {
-            const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuJPtEwzwo9O3MjCKYYQBbz_rGkod8Bjm4G13B4BwhD3RlmdP2WwBXK9Smy0mrlfdNvJtDHFCi-P9Y/pub?output=csv";
-            const nik = document.getElementById("nikInput").value.trim();
-            const resultDiv = document.getElementById("resultContainer");
+<script>
+    async function loadData() {
+        const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuJPtEwzwo9O3MjCKYYQBbz_rGkod8Bjm4G13B4BwhD3RlmdP2WwBXK9Smy0mrlfdNvJtDHFCi-P9Y/pub?output=csv";
+        const nik = document.getElementById("nikInput").value.trim();
+        const resultDiv = document.getElementById("resultContainer");
+        
+        // Validasi input
+        if (!nik) {
+            showError("Silakan masukkan NIK karyawan");
+            return;
+        }
+        
+        // Tampilkan loading
+        resultDiv.innerHTML = `
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        `;
+        
+        try {
+            // Ambil data dari Google Sheets
+            const response = await fetch(SPREADSHEET_URL);
             
-            // Tampilkan loading
-            resultDiv.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
+            if (!response.ok) {
+                throw new Error(`Gagal mengambil data. Status: ${response.status}`);
+            }
+            
+            const csvData = await response.text();
+            const rows = csvData.split("\n");
+            const header = rows[0].split(",");
 
-            try {
-                const response = await fetch(SPREADSHEET_URL);
-                if (!response.ok) throw new Error("Gagal mengambil data");
+            // Debug: Lihat struktur header
+            console.log("Header Kolom:", header);
+
+            // Cari index kolom AH sampai BB
+            const startCol = header.findIndex(col => col.trim() === "AH");
+            if (startCol === -1) throw new Error("Kolom AH tidak ditemukan");
+
+            // Buat mapping kolom ke tanggal (AH=11, AI=12, ..., BB=10)
+            const dateColumns = [];
+            const dateLabels = [];
+            
+            // Tanggal 11-31 (kolom AH-AR)
+            for (let i = 0; i < 31; i++) {
+                dateColumns.push(startCol + i);
+                dateLabels.push(`Tgl ${i+11}`);
+            }
+            
+            // Tanggal 1-10 bulan depan (kolom AS-BB)
+            for (let i = 31; i < 41; i++) {
+                dateColumns.push(startCol + i);
+                dateLabels.push(`Tgl ${i-30}`);
+            }
+
+            // Cari data karyawan
+            const karyawan = rows.find(row => {
+                const rowData = row.split(",");
+                return rowData[0].trim() === nik;
+            });
+
+            if (karyawan) {
+                const data = karyawan.split(",");
+                const nama = data[1] || '-';
+                const jabatan = data[2] || '-';
+                const departemen = data[3] || '-';
                 
-                const csvData = await response.text();
-                const rows = csvData.split("\n");
-                const header = rows[0].split(",");
-
-                // Debug: Lihat struktur header
-                console.log("Header Kolom:", header);
-
-                // Cari index kolom AH (tgl 11) sampai BB (tgl 10)
-                const startCol = header.findIndex(col => col.trim() === "AH");
-                if (startCol === -1) throw new Error("Kolom AH tidak ditemukan");
-
-                const dateColumns = [];
-                // 31 hari (11-31) + 10 hari (1-10) = 41 kolom
-                for (let i = 0; i < 41; i++) {
-                    dateColumns.push(startCol + i);
-                }
-
-                // Cari data karyawan
-                const karyawan = rows.find(row => {
-                    const rowData = row.split(",");
-                    return rowData[0].trim() === nik;
-                });
-
-                if (karyawan) {
-                    const data = karyawan.split(",");
-                    const nama = data[1] || '-';
-                    
-                    // Generate HTML untuk tabel absensi
-                    let tableHTML = `
-                        <table class="attendance-table">
-                            <tr>
-                                ${Array.from({length: 31}, (_, i) => `<th>Tgl ${i+11}</th>`).join('')}
-                                ${Array.from({length: 10}, (_, i) => `<th>Tgl ${i+1}</th>`).join('')}
-                            </tr>
-                            <tr>
-                                ${dateColumns.map(col => {
-                                    const status = (data[col] || '-').trim();
-                                    let className = '';
-                                    if (status.includes('Hadir')) className = 'status-hadir';
-                                    else if (status.includes('Izin')) className = 'status-izin';
-                                    else if (status.includes('Alpha')) className = 'status-alpha';
-                                    return `<td class="${className}">${status}</td>`;
-                                }).join('')}
-                            </tr>
-                        </table>
-                    `;
-
-                    resultDiv.innerHTML = `
-                        <div class="employee-card">
-                            <h2>${nama}</h2>
-                            <div style="overflow-x:auto">${tableHTML}</div>
-                        </div>
-                    `;
-                } else {
-                    throw new Error("Data karyawan tidak ditemukan");
-                }
-            } catch (error) {
+                // Generate inisial untuk avatar
+                const inisial = nama.split(" ").map(n => n[0]).join("").toUpperCase();
+                
+                // Buat HTML untuk menampilkan data
                 resultDiv.innerHTML = `
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <p>${error.message}</p>
+                    <div class="employee-card">
+                        <div class="employee-header">
+                            <div class="employee-avatar">${inisial}</div>
+                            <div class="employee-info">
+                                <h2>${nama}</h2>
+                                <div class="employee-meta">
+                                    <div class="meta-item">
+                                        <i class="fas fa-id-badge"></i>
+                                        <span>${nik}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-briefcase"></i>
+                                        <span>${jabatan}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-building"></i>
+                                        <span>${departemen}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="overflow-x: auto;">
+                            <table class="attendance-table">
+                                <thead>
+                                    <tr>
+                                        ${dateLabels.map(label => `<th>${label}</th>`).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        ${dateColumns.map(col => {
+                                            if (col >= data.length) return '<td>-</td>';
+                                            
+                                            const status = data[col].trim().toLowerCase();
+                                            let className = '';
+                                            let displayText = data[col];
+                                            
+                                            if (status.includes('hadir')) {
+                                                className = 'status-hadir';
+                                                if (status.includes('jam')) {
+                                                    displayText = 'Hadir';
+                                                    className += ' status-lembur';
+                                                }
+                                            } else if (status.includes('izin')) {
+                                                className = 'status-izin';
+                                            } else if (status.includes('alpha')) {
+                                                className = 'status-alpha';
+                                            }
+                                            
+                                            return `<td class="${className}">${displayText}</td>`;
+                                        }).join('')}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 `;
-                console.error("Error:", error);
+            } else {
+                showError("Data karyawan tidak ditemukan");
             }
+        } catch (error) {
+            console.error("Error:", error);
+            showError(`Terjadi kesalahan: ${error.message}`);
         }
-    </script>
-</body>
-</html>
+    }
+    
+    function showError(message) {
+        const resultDiv = document.getElementById("resultContainer");
+        resultDiv.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>${message}</p>
+            </div>
+        `;
+    }
+    
+    // Tambahkan event listener untuk tombol enter
+    document.getElementById("nikInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            loadData();
+        }
+    });
+</script>
