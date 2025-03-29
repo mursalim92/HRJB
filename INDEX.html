@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Info Absensi Karyawan</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Data Absensi Karyawan</h1>
+    <input type="text" id="nik" placeholder="Masukkan NIK">
+    <button onclick="loadData()">Cari</button>
+    <table id="hasil">
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        async function loadData() {
+            const nik = document.getElementById("nik").value;
+            const URL_GOOGLE_SHEETS_CSV = "PASTE_LINK_CSV_DARI_GOOGLE_SHEETS_DISINI";
+            
+            const response = await fetch(URL_GOOGLE_SHEETS_CSV);
+            const csvData = await response.text();
+            const rows = csvData.split("\n").slice(1); // Abaikan header
+
+            const tbody = document.querySelector("#hasil tbody");
+            tbody.innerHTML = ""; // Kosongkan tabel
+
+            rows.forEach(row => {
+                const [nikDB, nama, tanggal, status] = row.split(",");
+                if (nikDB.trim() === nik) {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `<td>${tanggal}</td><td>${status}</td>`;
+                    tbody.appendChild(tr);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
