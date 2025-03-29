@@ -339,6 +339,13 @@
             border: 1px solid var(--danger);
         }
         
+        .status-number {
+            background-color: rgba(44, 78, 58, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            font-weight: bold;
+        }
+        
         .status-lembur::after {
             content: '+';
             margin-left: 3px;
@@ -643,19 +650,34 @@
                                             ${dateColumns.map(col => {
                                                 if (col >= data.length) return '<td>-</td>';
                                                 
-                                                const status = data[col].trim().toLowerCase();
+                                                const cellValue = data[col].trim();
+                                                const lowerValue = cellValue.toLowerCase();
                                                 let className = '';
-                                                let displayText = data[col];
+                                                let displayText = cellValue;
                                                 
-                                                if (status.includes('hadir')) {
+                                                // Handle empty/blank values
+                                                if (cellValue === '' || cellValue === '-' || cellValue === ' ') {
+                                                    return '<td>-</td>';
+                                                }
+                                                
+                                                // Check if the value is a number
+                                                if (/^[\d.]+$/.test(cellValue)) {
+                                                    // Format as decimal with 2 places
+                                                    const numValue = parseFloat(cellValue);
+                                                    if (!isNaN(numValue)) {
+                                                        displayText = numValue.toFixed(2);
+                                                        className = 'status-number';
+                                                    }
+                                                } 
+                                                else if (lowerValue.includes('hadir')) {
                                                     className = 'status-hadir';
-                                                    if (status.includes('jam')) {
+                                                    if (lowerValue.includes('jam')) {
                                                         displayText = 'Hadir';
                                                         className += ' status-lembur';
                                                     }
-                                                } else if (status.includes('izin')) {
+                                                } else if (lowerValue.includes('izin')) {
                                                     className = 'status-izin';
-                                                } else if (status.includes('alpha')) {
+                                                } else if (lowerValue.includes('alpha')) {
                                                     className = 'status-alpha';
                                                 }
                                                 
