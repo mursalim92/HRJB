@@ -8,24 +8,31 @@ async function loadData() {
 
     try {
         const response = await fetch(SPREADSHEET_URL);
+        if (!response.ok) throw new Error("Gagal mengambil data");
+        
         const csvData = await response.text();
         const rows = csvData.split("\n");
-        const header = rows[0].split(","); // Ambil header kolom
+        const header = rows[0].split(",");
+
+        // Debug: Lihat struktur header
+        console.log("Header Kolom:", header);
 
         // Cari index kolom AH (tgl 11) sampai BB (tgl 10)
+        const startCol = header.findIndex(col => col.trim() === "AH");
+        if (startCol === -1) throw new Error("Kolom AH tidak ditemukan");
+
         const dateColumns = [];
-        for (let i = 0; i < header.length; i++) {
-            if (header[i].trim() === "AH") {
-                // Ambil 31 kolom setelah AH (tgl 11-31) + 10 kolom berikutnya (tgl 1-10)
-                dateColumns.push(...Array.from({length: 31}, (_, j) => i + j)); // AH=11, AI=12, ..., AR=31
-                dateColumns.push(...Array.from({length: 10}, (_, j) => i + 31 + j)); // AS=1, AT=2, ..., BB=10
-                break;
-            }
+        // 31 hari (11-31) + 10 hari (1-10) = 41 kolom
+        for (let i = 0; i < 41; i++) {
+            dateColumns.push(startCol + i);
         }
 
         // Cari data karyawan
-        const karyawan = rows.find(row => row.split(",")[0].trim() === nik);
-        
+        const karyawan = rows.find(row => {
+            const rowData = row.split(",");
+            return rowData[0].trim() === nik;
+        });
+
         if (karyawan) {
             const data = karyawan.split(",");
             const nama = data[1] || '-';
@@ -39,7 +46,7 @@ async function loadData() {
                     </tr>
                     <tr>
                         ${dateColumns.map(col => {
-                            const status = data[col]?.trim() || '-';
+                            const status = (data[col] || '-').trim();
                             let className = '';
                             if (status.includes('Hadir')) className = 'status-hadir';
                             else if (status.includes('Izin')) className = 'status-izin';
@@ -57,9 +64,26 @@ async function loadData() {
                 </div>
             `;
         } else {
-            showError("Data tidak ditemukan");
+            throw new Error("Data karyawan tidak ditemukan");
         }
     } catch (error) {
-        showError(`Error: ${error.message}`);
+        resultDiv.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>${error.message}</p>
+            </div>
+        `;
+        console.error("Error:", error);
     }
+}
+
+// Fungsi untuk menangani error
+function showError(message) {
+    const resultDiv = document.getElementById("resultContainer");
+    resultDiv.innerHTML = `
+        <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>${message}</p>
+        </div>
+    `;
 }
