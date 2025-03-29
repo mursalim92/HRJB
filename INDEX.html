@@ -1,285 +1,62 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Absensi Karyawan</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-        }
-        .search-box {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        input[type="text"] {
-            padding: 10px;
-            width: 300px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #3498db;
-            color: white;
-            position: sticky;
-            top: 0;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        .status-hadir {
-            color: green;
-            font-weight: bold;
-        }
-        .status-izin {
-            color: orange;
-            font-weight: bold;
-        }
-        .status-alpha {
-            color: red;
-            font-weight: bold;
-        }
-        .status-lembur {
-            color: blue;
-            font-weight: bold;
-        }
-        .month-separator {
-            background-color: #f8f9fa;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>DATA ABSENSI KARYAWAN</h1>
-        
-        <div class="search-box">
-            <h2>Cari Data Karyawan</h2>
-            <input type="text" id="nikInput" placeholder="Masukkan NIK Karyawan">
-            <button onclick="cariKaryawan()">Cari</button>
-        </div>
-        
-        <div id="result">
-            <!-- Hasil pencarian akan muncul di sini -->
-        </div>
-    </div>
+<script>
+  async function loadDataFromSheets() {
+    const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuJPtEwzwo9O3MjCKYYQBbz_rGkod8Bjm4G13B4BwhD3RlmdP2WwBXK9Smy0mrlfdNvJtDHFCi-P9Y/pub?gid=0&single=true&output=csv";
+    const nik = document.getElementById("nikInput").value;
+    const resultDiv = document.getElementById("result");
 
-    <script>
-        // Data dummy karyawan (bisa diganti dengan data dari database)
-        const dataKaryawan = [
-            {
-                nik: "1001",
-                nama: "Andi Wijaya",
-                jabatan: "Staff IT",
-                departemen: "IT",
-                absensi: {
-                    "11": { status: "Hadir", lembur: 1 },
-                    "12": { status: "Hadir", lembur: 0 },
-                    "13": { status: "Izin", lembur: 0 },
-                    "14": { status: "Hadir", lembur: 2 },
-                    "15": { status: "Hadir", lembur: 0 },
-                    "16": { status: "Alpha", lembur: 0 },
-                    "17": { status: "Hadir", lembur: 0 },
-                    "18": { status: "Hadir", lembur: 1 },
-                    "19": { status: "Hadir", lembur: 0 },
-                    "20": { status: "Hadir", lembur: 0 },
-                    "21": { status: "Hadir", lembur: 0 },
-                    "22": { status: "Izin", lembur: 0 },
-                    "23": { status: "Hadir", lembur: 0 },
-                    "24": { status: "Hadir", lembur: 0 },
-                    "25": { status: "Hadir", lembur: 0 },
-                    "26": { status: "Hadir", lembur: 0 },
-                    "27": { status: "Hadir", lembur: 0 },
-                    "28": { status: "Hadir", lembur: 0 },
-                    "29": { status: "Hadir", lembur: 0 },
-                    "30": { status: "Hadir", lembur: 0 },
-                    "31": { status: "Hadir", lembur: 0 },
-                    "1": { status: "Hadir", lembur: 0 },
-                    "2": { status: "Hadir", lembur: 1 },
-                    "3": { status: "Hadir", lembur: 0 },
-                    "4": { status: "Izin", lembur: 0 },
-                    "5": { status: "Hadir", lembur: 0 },
-                    "6": { status: "Hadir", lembur: 0 },
-                    "7": { status: "Hadir", lembur: 0 },
-                    "8": { status: "Hadir", lembur: 0 },
-                    "9": { status: "Hadir", lembur: 0 },
-                    "10": { status: "Hadir", lembur: 0 }
-                }
-            },
-            {
-                nik: "1002",
-                nama: "Budi Santoso",
-                jabatan: "Supervisor",
-                departemen: "Marketing",
-                absensi: {
-                    "11": { status: "Hadir", lembur: 0 },
-                    "12": { status: "Hadir", lembur: 0 },
-                    "13": { status: "Hadir", lembur: 0 },
-                    "14": { status: "Izin", lembur: 0 },
-                    "15": { status: "Hadir", lembur: 0 },
-                    "16": { status: "Hadir", lembur: 0 },
-                    "17": { status: "Hadir", lembur: 0 },
-                    "18": { status: "Alpha", lembur: 0 },
-                    "19": { status: "Hadir", lembur: 0 },
-                    "20": { status: "Hadir", lembur: 0 },
-                    "21": { status: "Hadir", lembur: 0 },
-                    "22": { status: "Hadir", lembur: 0 },
-                    "23": { status: "Hadir", lembur: 0 },
-                    "24": { status: "Hadir", lembur: 0 },
-                    "25": { status: "Hadir", lembur: 0 },
-                    "26": { status: "Hadir", lembur: 0 },
-                    "27": { status: "Hadir", lembur: 0 },
-                    "28": { status: "Hadir", lembur: 0 },
-                    "29": { status: "Hadir", lembur: 0 },
-                    "30": { status: "Hadir", lembur: 0 },
-                    "31": { status: "Hadir", lembur: 0 },
-                    "1": { status: "Hadir", lembur: 0 },
-                    "2": { status: "Hadir", lembur: 0 },
-                    "3": { status: "Hadir", lembur: 0 },
-                    "4": { status: "Hadir", lembur: 0 },
-                    "5": { status: "Izin", lembur: 0 },
-                    "6": { status: "Hadir", lembur: 0 },
-                    "7": { status: "Hadir", lembur: 0 },
-                    "8": { status: "Hadir", lembur: 0 },
-                    "9": { status: "Hadir", lembur: 0 },
-                    "10": { status: "Hadir", lembur: 0 }
-                }
-            }
-        ];
+    try {
+      // Ambil data dari Google Sheets
+      const response = await fetch(SPREADSHEET_URL);
+      const csvData = await response.text();
+      const rows = csvData.split("\n").slice(1); // Skip header
 
-        function cariKaryawan() {
-            const nik = document.getElementById("nikInput").value;
-            const resultDiv = document.getElementById("result");
-            
-            // Cari karyawan berdasarkan NIK
-            const karyawan = dataKaryawan.find(k => k.nik === nik);
-            
-            if (karyawan) {
-                // Dapatkan bulan sekarang dan bulan depan
-                const now = new Date();
-                const currentMonth = now.getMonth();
-                const currentYear = now.getFullYear();
-                const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
-                const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear;
-                
-                // Generate tanggal dari 11 bulan ini sampai 10 bulan depan
-                const dates = [];
-                const daysInCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-                
-                // Tanggal 11 sampai akhir bulan ini
-                for (let day = 11; day <= daysInCurrentMonth; day++) {
-                    dates.push({
-                        day: day,
-                        month: currentMonth,
-                        year: currentYear
-                    });
-                }
-                
-                // Tanggal 1-10 bulan depan
-                for (let day = 1; day <= 10; day++) {
-                    dates.push({
-                        day: day,
-                        month: nextMonth,
-                        year: nextYear
-                    });
-                }
-                
-                // Buat header tabel dengan nama bulan
-                let headerHTML = '';
-                let lastMonth = null;
-                
-                dates.forEach(date => {
-                    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", 
-                                       "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-                    const currentMonthName = monthNames[date.month];
-                    
-                    if (lastMonth !== date.month) {
-                        headerHTML += `<th colspan="1" class="month-separator">${currentMonthName}</th>`;
-                        lastMonth = date.month;
-                    }
-                });
-                
-                // Buat tabel jika data ditemukan
-                let tableHTML = `
-                    <h2>Data Karyawan</h2>
-                    <div style="overflow-x: auto;">
-                        <table>
-                            <tr>
-                                <th rowspan="2">NIK</th>
-                                <th rowspan="2">Nama</th>
-                                <th rowspan="2">Jabatan</th>
-                                <th rowspan="2">Departemen</th>
-                                ${headerHTML}
-                            </tr>
-                            <tr>
-                                ${dates.map(date => `<th>${date.day}</th>`).join('')}
-                            </tr>
-                            <tr>
-                                <td>${karyawan.nik}</td>
-                                <td>${karyawan.nama}</td>
-                                <td>${karyawan.jabatan}</td>
-                                <td>${karyawan.departemen}</td>
-                                ${dates.map(date => {
-                                    const dayStr = date.day.toString();
-                                    const absen = karyawan.absensi[dayStr] || { status: '-', lembur: 0 };
-                                    let className = '';
-                                    if (absen.status === 'Hadir') className = 'status-hadir';
-                                    else if (absen.status === 'Izin') className = 'status-izin';
-                                    else if (absen.status === 'Alpha') className = 'status-alpha';
-                                    
-                                    let displayText = absen.status;
-                                    if (absen.lembur > 0) {
-                                        displayText += ` (${absen.lembur} jam)`;
-                                        className = 'status-lembur';
-                                    }
-                                    
-                                    return `<td class="${className}">${displayText}</td>`;
-                                }).join('')}
-                            </tr>
-                        </table>
-                    </div>
-                `;
-                
-                resultDiv.innerHTML = tableHTML;
-            } else {
-                resultDiv.innerHTML = '<p style="color: red; text-align: center;">Data karyawan tidak ditemukan</p>';
-            }
-        }
-    </script>
-</body>
-</html>
+      // Cari data berdasarkan NIK
+      const karyawan = rows.find(row => row.split(",")[0].trim() === nik);
+
+      if (karyawan) {
+        const data = karyawan.split(",");
+        const nama = data[1];
+        const jabatan = data[2];
+        const dept = data[3];
+        
+        // Generate tabel (sesuaikan dengan struktur spreadsheet Anda)
+        let tableHTML = `
+          <h2>Data Karyawan</h2>
+          <table>
+            <tr>
+              <th>NIK</th>
+              <th>Nama</th>
+              <th>Jabatan</th>
+              <th>Departemen</th>
+              ${Array.from({length: 30}, (_, i) => `<th>Tgl ${i+11 > 31 ? i-20 : i+11}</th>`).join('')}
+            </tr>
+            <tr>
+              <td>${nik}</td>
+              <td>${nama}</td>
+              <td>${jabatan}</td>
+              <td>${dept}</td>
+              ${data.slice(4).map(status => {
+                let className = '';
+                if (status.includes("Hadir")) className = "status-hadir";
+                else if (status.includes("Izin")) className = "status-izin";
+                else if (status.includes("Alpha")) className = "status-alpha";
+                return `<td class="${className}">${status}</td>`;
+              }).join('')}
+            </tr>
+          </table>
+        `;
+
+        resultDiv.innerHTML = tableHTML;
+      } else {
+        resultDiv.innerHTML = '<p style="color:red">Data tidak ditemukan</p>';
+      }
+    } catch (error) {
+      resultDiv.innerHTML = `<p style="color:red">Error: ${error.message}</p>`;
+    }
+  }
+
+  // Update fungsi cariKaryawan
+  function cariKaryawan() {
+    loadDataFromSheets();
+  }
+</script>
