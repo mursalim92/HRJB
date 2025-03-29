@@ -42,25 +42,69 @@
             padding: 30px;
         }
         
+        .company-header {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .company-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        .company-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .company-header p {
+            font-size: 16px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .company-logo {
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .company-logo i {
+            color: var(--primary);
+            font-size: 28px;
+        }
+        
         h1 {
             color: var(--primary);
             text-align: center;
             margin-bottom: 20px;
             font-weight: 500;
             position: relative;
-            padding-bottom: 10px;
-        }
-        
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background-color: var(--primary);
-            border-radius: 3px;
         }
         
         .search-container {
@@ -268,6 +312,10 @@
                 padding: 15px;
             }
             
+            .company-header h1 {
+                font-size: 22px;
+            }
+            
             .search-container {
                 flex-direction: column;
             }
@@ -300,7 +348,14 @@
 </head>
 <body>
     <div class="container">
-        <h1></B> PT JHONLIN BARATAMA</h1>
+        <div class="company-header">
+            <div class="company-logo">
+                <i class="fas fa-building"></i>
+            </div>
+            <h1>PT JHONLIN BARATAMA</h1>
+            <p>Sistem Manajemen Sumber Daya Manusia</p>
+        </div>
+        
         <h1><i class="fas fa-calendar-check"></i> Sistem Absensi Karyawan</h1>
         
         <div class="search-container">
