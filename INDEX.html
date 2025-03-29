@@ -1,48 +1,190 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Info Absensi Karyawan</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Absensi Karyawan</title>
     <style>
-        body { font-family: Arial; margin: 20px; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-        th { background-color: #f2f2f2; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .search-box {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .status-hadir {
+            color: green;
+        }
+        .status-izin {
+            color: orange;
+        }
+        .status-alpha {
+            color: red;
+        }
     </style>
 </head>
 <body>
-    <h1>Data Absensi Karyawan</h1>
-    <input type="text" id="nik" placeholder="Masukkan NIK">
-    <button onclick="loadData()">Cari</button>
-    <table id="hasil">
-        <thead>
-            <tr>
-                <th>Tanggal</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <div class="container">
+        <h1>DATA ABSENSI KARYAWAN</h1>
+        
+        <div class="search-box">
+            <h2>Cari Data Karyawan</h2>
+            <input type="text" id="nikInput" placeholder="Masukkan NIK Karyawan">
+            <button onclick="cariKaryawan()">Cari</button>
+        </div>
+        
+        <div id="result">
+            <!-- Hasil pencarian akan muncul di sini -->
+        </div>
+    </div>
 
     <script>
-        async function loadData() {
-            const nik = document.getElementById("nik").value;
-            const URL_GOOGLE_SHEETS_CSV = "PASTE_LINK_CSV_DARI_GOOGLE_SHEETS_DISINI";
-            
-            const response = await fetch(URL_GOOGLE_SHEETS_CSV);
-            const csvData = await response.text();
-            const rows = csvData.split("\n").slice(1); // Abaikan header
-
-            const tbody = document.querySelector("#hasil tbody");
-            tbody.innerHTML = ""; // Kosongkan tabel
-
-            rows.forEach(row => {
-                const [nikDB, nama, tanggal, status] = row.split(",");
-                if (nikDB.trim() === nik) {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `<td>${tanggal}</td><td>${status}</td>`;
-                    tbody.appendChild(tr);
+        // Data dummy karyawan (bisa diganti dengan data dari database)
+        const dataKaryawan = [
+            {
+                nik: "1001",
+                nama: "Andi Wijaya",
+                jabatan: "Staff IT",
+                departemen: "IT",
+                absensi: {
+                    "1": "Hadir",
+                    "2": "Hadir",
+                    "3": "Izin",
+                    "4": "Hadir",
+                    "5": "Hadir",
+                    "6": "Alpha",
+                    "7": "Hadir",
+                    "8": "Hadir",
+                    "9": "Hadir",
+                    "10": "Hadir"
                 }
-            });
+            },
+            {
+                nik: "1002",
+                nama: "Budi Santoso",
+                jabatan: "Supervisor",
+                departemen: "Marketing",
+                absensi: {
+                    "1": "Hadir",
+                    "2": "Hadir",
+                    "3": "Hadir",
+                    "4": "Izin",
+                    "5": "Hadir",
+                    "6": "Hadir",
+                    "7": "Hadir",
+                    "8": "Alpha",
+                    "9": "Hadir",
+                    "10": "Hadir"
+                }
+            },
+            {
+                nik: "1003",
+                nama: "Citra Dewi",
+                jabatan: "Manager",
+                departemen: "HRD",
+                absensi: {
+                    "1": "Hadir",
+                    "2": "Hadir",
+                    "3": "Hadir",
+                    "4": "Hadir",
+                    "5": "Hadir",
+                    "6": "Hadir",
+                    "7": "Izin",
+                    "8": "Hadir",
+                    "9": "Hadir",
+                    "10": "Hadir"
+                }
+            }
+        ];
+
+        function cariKaryawan() {
+            const nik = document.getElementById("nikInput").value;
+            const resultDiv = document.getElementById("result");
+            
+            // Cari karyawan berdasarkan NIK
+            const karyawan = dataKaryawan.find(k => k.nik === nik);
+            
+            if (karyawan) {
+                // Buat tabel jika data ditemukan
+                let tableHTML = `
+                    <h2>Data Karyawan</h2>
+                    <table>
+                        <tr>
+                            <th>NIK</th>
+                            <th>Nama</th>
+                            <th>Jabatan</th>
+                            <th>Departemen</th>
+                            ${Array.from({length: 10}, (_, i) => `<th>Tgl ${i+1}</th>`).join('')}
+                        </tr>
+                        <tr>
+                            <td>${karyawan.nik}</td>
+                            <td>${karyawan.nama}</td>
+                            <td>${karyawan.jabatan}</td>
+                            <td>${karyawan.departemen}</td>
+                            ${Array.from({length: 10}, (_, i) => {
+                                const tgl = (i+1).toString();
+                                const status = karyawan.absensi[tgl];
+                                let className = '';
+                                if (status === 'Hadir') className = 'status-hadir';
+                                else if (status === 'Izin') className = 'status-izin';
+                                else if (status === 'Alpha') className = 'status-alpha';
+                                return `<td class="${className}">${status}</td>`;
+                            }).join('')}
+                        </tr>
+                    </table>
+                `;
+                
+                resultDiv.innerHTML = tableHTML;
+            } else {
+                resultDiv.innerHTML = '<p style="color: red;">Data karyawan tidak ditemukan</p>';
+            }
         }
     </script>
 </body>
