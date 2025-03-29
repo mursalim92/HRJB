@@ -1,62 +1,66 @@
-<script>
-  async function loadDataFromSheets() {
-    const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuJPtEwzwo9O3MjCKYYQBbz_rGkod8Bjm4G13B4BwhD3RlmdP2WwBXK9Smy0mrlfdNvJtDHFCi-P9Y/pub?gid=0&single=true&output=csv";
-    const nik = document.getElementById("nikInput").value;
-    const resultDiv = document.getElementById("result");
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Absensi Karyawan</title>
+  <style>
+    table, th, td { border: 1px solid black; padding: 5px; }
+    .hadir { color: green; }
+    .izin { color: orange; }
+    .alpha { color: red; }
+  </style>
+</head>
+<body>
+  <input type="text" id="nikInput" placeholder="Masukkan NIK">
+  <button onclick="loadData()">Cari</button>
+  <div id="result"></div>
 
-    try {
-      // Ambil data dari Google Sheets
-      const response = await fetch(SPREADSHEET_URL);
-      const csvData = await response.text();
-      const rows = csvData.split("\n").slice(1); // Skip header
+  <script>
+    async function loadData() {
+      const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuJPtEwzwo9O3MjCKYYQBbz_rGkod8Bjm4G13B4BwhD3RlmdP2WwBXK9Smy0mrlfdNvJtDHFCi-P9Y/pub?output=csv";
+      const nik = document.getElementById("nikInput").value;
+      const resultDiv = document.getElementById("result");
 
-      // Cari data berdasarkan NIK
-      const karyawan = rows.find(row => row.split(",")[0].trim() === nik);
+      try {
+        console.log("Mengambil data..."); // Debug 1
+        const response = await fetch(SPREADSHEET_URL);
+        const csvData = await response.text();
+        console.log("Data mentah:", csvData); // Debug 2
 
-      if (karyawan) {
-        const data = karyawan.split(",");
-        const nama = data[1];
-        const jabatan = data[2];
-        const dept = data[3];
-        
-        // Generate tabel (sesuaikan dengan struktur spreadsheet Anda)
-        let tableHTML = `
-          <h2>Data Karyawan</h2>
-          <table>
-            <tr>
-              <th>NIK</th>
-              <th>Nama</th>
-              <th>Jabatan</th>
-              <th>Departemen</th>
-              ${Array.from({length: 30}, (_, i) => `<th>Tgl ${i+11 > 31 ? i-20 : i+11}</th>`).join('')}
-            </tr>
-            <tr>
-              <td>${nik}</td>
-              <td>${nama}</td>
-              <td>${jabatan}</td>
-              <td>${dept}</td>
-              ${data.slice(4).map(status => {
-                let className = '';
-                if (status.includes("Hadir")) className = "status-hadir";
-                else if (status.includes("Izin")) className = "status-izin";
-                else if (status.includes("Alpha")) className = "status-alpha";
-                return `<td class="${className}">${status}</td>`;
-              }).join('')}
-            </tr>
-          </table>
-        `;
+        const rows = csvData.split("\n");
+        const header = rows[0].split(",");
+        const karyawan = rows.find(row => row.split(",")[0] === nik);
 
-        resultDiv.innerHTML = tableHTML;
-      } else {
-        resultDiv.innerHTML = '<p style="color:red">Data tidak ditemukan</p>';
+        if (karyawan) {
+          const data = karyawan.split(",");
+          let tableHTML = `
+            <table>
+              <tr><th>NIK</th><th>Nama</th><th>Jabatan</th><th>Departemen</th></tr>
+              <tr>
+                <td>${data[0]}</td>
+                <td>${data[1]}</td>
+                <td>${data[2]}</td>
+                <td>${data[3]}</td>
+              </tr>
+              <tr><th colspan="4">Absensi (11-10)</th></tr>
+              <tr>
+          `;
+
+          // Loop untuk tanggal 11-31 dan 1-10
+          for (let i = 4; i < header.length; i++) {
+            const status = data[i].trim().toLowerCase();
+            tableHTML += `<td class="${status}">${header[i]}: ${data[i]}</td>`;
+          }
+
+          tableHTML += `</tr></table>`;
+          resultDiv.innerHTML = tableHTML;
+        } else {
+          resultDiv.innerHTML = "Data tidak ditemukan!";
+        }
+      } catch (error) {
+        console.error("Error:", error); // Debug 3
+        resultDiv.innerHTML = "Gagal memuat data. Cek console untuk detail.";
       }
-    } catch (error) {
-      resultDiv.innerHTML = `<p style="color:red">Error: ${error.message}</p>`;
     }
-  }
-
-  // Update fungsi cariKaryawan
-  function cariKaryawan() {
-    loadDataFromSheets();
-  }
-</script>
+  </script>
+</body>
+</html>
