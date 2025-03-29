@@ -554,171 +554,152 @@
     </div>
 
     <script>
-        async function loadData() {
-            const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuJPtEwzwo9O3MjCKYYQBbz_rGkod8Bjm4G13B4BwhD3RlmdP2WwBXK9Smy0mrlfdNvJtDHFCi-P9Y/pub?output=csv";
-            const nik = document.getElementById("nikInput").value.trim();
-            const resultDiv = document.getElementById("resultContainer");
+        <script>
+    async function loadData() {
+        const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuJPtEwzwo9O3MjCKYYQBbz_rGkod8Bjm4G13B4BwhD3RlmdP2WwBXK9Smy0mrlfdNvJtDHFCi-P9Y/pub?output=csv";
+        const nik = document.getElementById("nikInput").value.trim();
+        const resultDiv = document.getElementById("resultContainer");
+        
+        // Validasi input
+        if (!nik) {
+            showError("Silakan masukkan NIK karyawan");
+            return;
+        }
+        
+        // Tampilkan loading
+        resultDiv.innerHTML = `
+            <div class="loading">
+                <div class="spinner"></div>
+                <div class="loading-text">Memuat data karyawan...</div>
+            </div>
+        `;
+        
+        try {
+            // Ambil data dari Google Sheets
+            const response = await fetch(SPREADSHEET_URL);
             
-            // Validasi input
-            if (!nik) {
-                showError("Silakan masukkan NIK karyawan");
-                return;
+            if (!response.ok) {
+                throw new Error(`Gagal mengambil data. Status: ${response.status}`);
             }
             
-            // Tampilkan loading
-            resultDiv.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <div class="loading-text">Memuat data karyawan...</div>
-                </div>
-            `;
+            const csvData = await response.text();
+            const rows = csvData.split("\n");
+            const header = rows[0].split(",");
+
+            // Cari index kolom tanggal (dimulai setelah DEPARTEMEN)
+            const baseInfoCols = 4; // NIK, NAMA, JABATAN, DEPARTEMEN
+            const dateColumns = [];
+            const dateLabels = [];
             
-            try {
-                // Ambil data dari Google Sheets
-                const response = await fetch(SPREADSHEET_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`Gagal mengambil data. Status: ${response.status}`);
+            // Proses kolom tanggal (11-28 dan 1-10)
+            for (let i = baseInfoCols; i < header.length; i++) {
+                const colTitle = header[i].trim();
+                if (/^\d+$/.test(colTitle)) { // Jika kolom berisi angka
+                    dateColumns.push(i);
+                    dateLabels.push(`Tgl ${colTitle}`);
                 }
+            }
+
+            // Cari data karyawan
+            const karyawan = rows.find(row => {
+                const rowData = row.split(",");
+                return rowData[0].trim() === nik;
+            });
+
+            if (karyawan) {
+                const data = karyawan.split(",");
+                const nama = data[1] || '-';
+                const jabatan = data[2] || '-';
+                const departemen = data[3] || '-';
                 
-                const csvData = await response.text();
-                const rows = csvData.split("\n");
-                const header = rows[0].split(",");
-
-                // Cari index kolom tanggal (dimulai setelah DEPARTEMEN)
-                const baseInfoCols = 4; // NIK, NAMA, JABATAN, DEPARTEMEN
-                const dateColumns = [];
-                const dateLabels = [];
+                // Generate inisial untuk avatar
+                const inisial = nama.split(" ").map(n => n[0]).join("").toUpperCase();
                 
-                // Proses kolom tanggal (11-28 dan 1-10)
-                for (let i = baseInfoCols; i < header.length; i++) {
-                    const colTitle = header[i].trim();
-                    if (/^\d+$/.test(colTitle)) { // Jika kolom berisi angka
-                        dateColumns.push(i);
-                        dateLabels.push(`Tgl ${colTitle}`);
-                    }
-                }
-
-                // Cari data karyawan
-                const karyawan = rows.find(row => {
-                    const rowData = row.split(",");
-                    return rowData[0].trim() === nik;
-                });
-
-                if (karyawan) {
-                    const data = karyawan.split(",");
-                    const nama = data[1] || '-';
-                    const jabatan = data[2] || '-';
-                    const departemen = data[3] || '-';
-                    
-                    // Generate inisial untuk avatar
-                    const inisial = nama.split(" ").map(n => n[0]).join("").toUpperCase();
-                    
-                    // Buat HTML untuk menampilkan data
-                    resultDiv.innerHTML = `
-                        <div class="employee-card">
-                            <div class="employee-header">
-                                <div class="employee-avatar">${inisial}</div>
-                                <div class="employee-info">
-                                    <h2>${nama}</h2>
-                                    <div class="employee-meta">
-                                        <div class="meta-item">
-                                            <i class="fas fa-id-badge"></i>
-                                            <span>${nik}</span>
-                                        </div>
-                                        <div class="meta-item">
-                                            <i class="fas fa-briefcase"></i>
-                                            <span>${jabatan}</span>
-                                        </div>
-                                        <div class="meta-item">
-                                            <i class="fas fa-hard-hat"></i>
-                                            <span>${departemen}</span>
-                                        </div>
+                // Buat HTML untuk menampilkan data
+                resultDiv.innerHTML = `
+                    <div class="employee-card">
+                        <div class="employee-header">
+                            <div class="employee-avatar">${inisial}</div>
+                            <div class="employee-info">
+                                <h2>${nama}</h2>
+                                <div class="employee-meta">
+                                    <div class="meta-item">
+                                        <i class="fas fa-id-badge"></i>
+                                        <span>${nik}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-briefcase"></i>
+                                        <span>${jabatan}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-hard-hat"></i>
+                                        <span>${departemen}</span>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div style="overflow-x: auto;">
-                                <table class="attendance-table">
-                                    <thead>
-                                        <tr>
-                                            ${dateLabels.map(label => `<th>${label}</th>`).join('')}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            ${dateColumns.map(col => {
-                                                if (col >= data.length) return '<td>-</td>';
-                                                
-                                                const cellValue = data[col].trim();
-                                                const lowerValue = cellValue.toLowerCase();
-                                                let className = '';
-                                                let displayText = cellValue;
-                                                
-                                                // Handle empty/blank values
-                                                if (cellValue === '' || cellValue === '-' || cellValue === ' ') {
-                                                    return '<td>-</td>';
-                                                }
-                                                
-                                                // Check if the value is a number
-                                                if (/^[\d.]+$/.test(cellValue)) {
-                                                    // Format as decimal with 2 places
-                                                    const numValue = parseFloat(cellValue);
-                                                    if (!isNaN(numValue)) {
-                                                        displayText = numValue.toFixed(2);
-                                                        className = 'status-number';
-                                                    }
-                                                } 
-                                                else if (lowerValue.includes('hadir')) {
-                                                    className = 'status-hadir';
-                                                    if (lowerValue.includes('jam')) {
-                                                        displayText = 'Hadir';
-                                                        className += ' status-lembur';
-                                                    }
-                                                } else if (lowerValue.includes('izin')) {
-                                                    className = 'status-izin';
-                                                } else if (lowerValue.includes('alpha')) {
-                                                    className = 'status-alpha';
-                                                }
-                                                
-                                                return `<td class="${className}">${displayText}</td>`;
-                                            }).join('')}
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>
-                    `;
-                } else {
-                    showError("Data karyawan tidak ditemukan");
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                showError(`Terjadi kesalahan: ${error.message}`);
+                        
+                        <div style="overflow-x: auto;">
+                            <table class="attendance-table">
+                                <thead>
+                                    <tr>
+                                        ${dateLabels.map(label => `<th>${label}</th>`).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        ${dateColumns.map(col => {
+                                            if (col >= data.length) return '<td>-</td>';
+                                            
+                                            const cellValue = data[col].trim();
+                                            const lowerValue = cellValue.toLowerCase();
+                                            let className = '';
+                                            let displayText = cellValue;
+                                            
+                                            // Handle empty/blank values
+                                            if (cellValue === '' || cellValue === '-' || cellValue === ' ') {
+                                                return '<td>-</td>';
+                                            }
+                                            
+                                            // Check if the value is a number (integer or decimal)
+                                            if (/^\d*\.?\d+$/.test(cellValue)) {
+                                                // Format as decimal with 1 decimal place
+                                                const numValue = parseFloat(cellValue);
+                                                if (!isNaN(numValue)) {
+                                                    // Format to 1 decimal place, but don't add .0 if it's a whole number
+                                                    displayText = numValue % 1 === 0 ? numValue.toFixed(1) : numValue.toFixed(1);
+                                                    className = 'status-number';
+                                                }
+                                            } 
+                                            else if (lowerValue.includes('hadir')) {
+                                                className = 'status-hadir';
+                                                if (lowerValue.includes('jam')) {
+                                                    displayText = 'Hadir';
+                                                    className += ' status-lembur';
+                                                }
+                                            } else if (lowerValue.includes('izin')) {
+                                                className = 'status-izin';
+                                            } else if (lowerValue.includes('alpha')) {
+                                                className = 'status-alpha';
+                                            }
+                                            
+                                            return `<td class="${className}">${displayText}</td>`;
+                                        }).join('')}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else {
+                showError("Data karyawan tidak ditemukan");
             }
+        } catch (error) {
+            console.error("Error:", error);
+            showError(`Terjadi kesalahan: ${error.message}`);
         }
-        
-        function showError(message) {
-            const resultDiv = document.getElementById("resultContainer");
-            resultDiv.innerHTML = `
-                <div class="error-message">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p>${message}</p>
-                </div>
-            `;
-        }
-        
-        // Tambahkan event listener untuk tombol enter
-        document.getElementById("nikInput").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                loadData();
-            }
-        });
-        
-        // Animasi truck pada desktop
-        if (window.innerWidth >= 992) {
-            document.querySelector('.moving-truck').style.display = 'block';
-        }
+    }
+</script>
     </script>
 </body>
 </html>
