@@ -492,6 +492,11 @@
                 HUMAN RESOURCES SYSTEM 
                 <i class="fas fa-hammer truck-icon"></i>
             </p>
+            <p class="mining-subtitle">
+                <i class="fas fa-mountain truck-icon"></i> 
+                SUNGAI DUA MINING PROJECT 
+                <i class="fas fa-hammer truck-icon"></i>
+            </p>
         </div>
         
         <h1 class="mining-section-title">
@@ -557,10 +562,8 @@
                 
                 for (let i = baseInfoCols; i < header.length; i++) {
                     const colTitle = header[i].trim();
-                    // Tangkap kolom dengan format tanggal DD/MM/YYYY
                     if (colTitle.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
                         dateColumns.push(i);
-                        // Format label menjadi DD/MM (tanpa tahun)
                         const [day, month] = colTitle.split('/');
                         dateLabels.push(`${day}/${month}`);
                     }
@@ -620,6 +623,8 @@
                                                     return '<td>-</td>';
                                                 }
                                                 
+                                                // Tampilkan nilai persis seperti di spreadsheet
+                                                // Baik itu "5", "5,5", "Hadir", dll
                                                 return `<td>${cellValue}</td>`;
                                             }).join('')}
                                         </tr>
