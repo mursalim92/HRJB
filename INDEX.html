@@ -550,8 +550,9 @@
                 }
                 
                 const csvData = await response.text();
-                const rows = csvData.split("\n");
-                const header = rows[0].split(",");
+                // Parse CSV dengan lebih baik untuk mempertahankan koma
+                const rows = parseCSV(csvData);
+                const header = rows[0];
     
                 // Proses header untuk kolom tanggal
                 const dateColumns = [];
@@ -569,12 +570,11 @@
     
                 // Cari data karyawan
                 const karyawan = rows.find(row => {
-                    const rowData = row.split(",");
-                    return rowData[0].trim() === nik;
+                    return row[0].trim() === nik;
                 });
     
                 if (karyawan) {
-                    const data = karyawan.split(",");
+                    const data = karyawan;
                     const nama = data[1] || '-';
                     const jabatan = data[2] || '-';
                     const departemen = data[3] || '-';
@@ -622,7 +622,6 @@
                                                 }
                                                 
                                                 // Tampilkan nilai persis seperti di spreadsheet
-                                                // Baik itu "5", "5,5", "Hadir", dll
                                                 return `<td>${cellValue}</td>`;
                                             }).join('')}
                                         </tr>
@@ -638,6 +637,37 @@
                 console.error("Error:", error);
                 showError(`Terjadi kesalahan: ${error.message}`);
             }
+        }
+    
+        // Fungsi untuk parsing CSV yang lebih baik
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const result = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                let current = '';
+                let inQuotes = false;
+                const row = [];
+                
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        row.push(current);
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                
+                row.push(current);
+                result.push(row);
+            }
+            
+            return result;
         }
         
         function showError(message) {
