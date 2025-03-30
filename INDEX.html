@@ -620,22 +620,7 @@
                                                     return '<td>-</td>';
                                                 }
                                                 
-                                                // Tetap pertahankan format asli
-                                                let className = '';
-                                                const lowerValue = cellValue.toLowerCase();
-                                                
-                                                if (lowerValue.includes('hadir')) {
-                                                    className = 'status-hadir';
-                                                    if (lowerValue.includes('jam')) {
-                                                        className += ' status-lembur';
-                                                    }
-                                                } else if (lowerValue.includes('izin')) {
-                                                    className = 'status-izin';
-                                                } else if (lowerValue.includes('alpha')) {
-                                                    className = 'status-alpha';
-                                                }
-                                                
-                                                return `<td class="${className}">${cellValue}</td>`;
+                                                return `<td>${cellValue}</td>`;
                                             }).join('')}
                                         </tr>
                                     </tbody>
