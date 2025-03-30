@@ -527,13 +527,11 @@
             const nik = document.getElementById("nikInput").value.trim();
             const resultDiv = document.getElementById("resultContainer");
             
-            // Validasi input
             if (!nik) {
                 showError("Silakan masukkan NIK karyawan");
                 return;
             }
             
-            // Tampilkan loading
             resultDiv.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
@@ -542,7 +540,6 @@
             `;
             
             try {
-                // Ambil data dari Google Sheets
                 const response = await fetch(SPREADSHEET_URL);
                 
                 if (!response.ok) {
@@ -553,16 +550,19 @@
                 const rows = csvData.split("\n");
                 const header = rows[0].split(",");
     
-                // Cari index kolom tanggal
-                const baseInfoCols = 4; // NIK, NAMA, JABATAN, DEPARTEMEN
+                // Proses header untuk kolom tanggal
                 const dateColumns = [];
                 const dateLabels = [];
+                const baseInfoCols = 4; // NIK, Nama, Jabatan, Departemen
                 
                 for (let i = baseInfoCols; i < header.length; i++) {
                     const colTitle = header[i].trim();
-                    if (/^\d+$/.test(colTitle)) {
+                    // Tangkap kolom dengan format tanggal DD/MM/YYYY
+                    if (colTitle.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
                         dateColumns.push(i);
-                        dateLabels.push(`Tgl ${colTitle}`);
+                        // Format label menjadi DD/MM (tanpa tahun)
+                        const [day, month] = colTitle.split('/');
+                        dateLabels.push(`${day}/${month}`);
                     }
                 }
     
@@ -578,10 +578,8 @@
                     const jabatan = data[2] || '-';
                     const departemen = data[3] || '-';
                     
-                    // Generate inisial untuk avatar
                     const inisial = nama.split(" ").map(n => n[0]).join("").toUpperCase();
                     
-                    // Buat HTML untuk menampilkan data
                     resultDiv.innerHTML = `
                         <div class="employee-card">
                             <div class="employee-header">
@@ -618,21 +616,14 @@
                                                 if (col >= data.length) return '<td>-</td>';
                                                 
                                                 let cellValue = data[col].trim();
-                                                const lowerValue = cellValue.toLowerCase();
-                                                let className = '';
-                                                
-                                                // Handle empty/blank values
                                                 if (cellValue === '' || cellValue === '-' || cellValue === ' ') {
                                                     return '<td>-</td>';
                                                 }
                                                 
-                                                // Pertahankan format angka dengan koma
-                                                if (/^\d+,\d+$/.test(cellValue)) {
-                                                    // Biarkan nilai numerik dengan koma apa adanya
-                                                    return `<td>${cellValue}</td>`;
-                                                }
+                                                // Tetap pertahankan format asli
+                                                let className = '';
+                                                const lowerValue = cellValue.toLowerCase();
                                                 
-                                                // Tetapkan class status untuk teks
                                                 if (lowerValue.includes('hadir')) {
                                                     className = 'status-hadir';
                                                     if (lowerValue.includes('jam')) {
