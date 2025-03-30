@@ -552,7 +552,7 @@
                 const csvData = await response.text();
                 const rows = csvData.split("\n");
                 const header = rows[0].split(",");
-
+    
                 // Cari index kolom tanggal (dimulai setelah DEPARTEMEN)
                 const baseInfoCols = 4; // NIK, NAMA, JABATAN, DEPARTEMEN
                 const dateColumns = [];
@@ -566,13 +566,13 @@
                         dateLabels.push(`Tgl ${colTitle}`);
                     }
                 }
-
+    
                 // Cari data karyawan
                 const karyawan = rows.find(row => {
                     const rowData = row.split(",");
                     return rowData[0].trim() === nik;
                 });
-
+    
                 if (karyawan) {
                     const data = karyawan.split(",");
                     const nama = data[1] || '-';
@@ -618,7 +618,7 @@
                                             ${dateColumns.map(col => {
                                                 if (col >= data.length) return '<td>-</td>';
                                                 
-                                                const cellValue = data[col].trim();
+                                                let cellValue = data[col].trim();
                                                 const lowerValue = cellValue.toLowerCase();
                                                 let className = '';
                                                 let displayText = cellValue;
@@ -628,16 +628,32 @@
                                                     return '<td>-</td>';
                                                 }
                                                 
-                                                // Apply status classes but keep original text formatting
+                                                // Standardize the data format according to database
                                                 if (lowerValue.includes('hadir')) {
                                                     className = 'status-hadir';
+                                                    // Format: "Hadir (Jam)" or "Hadir"
+                                                    displayText = 'Hadir';
                                                     if (lowerValue.includes('jam')) {
-                                                        className += ' status-lembur';
+                                                        const jamMatch = cellValue.match(/(\d+)/);
+                                                        if (jamMatch) {
+                                                            displayText = `Hadir (${jamMatch[0]} Jam)`;
+                                                            className += ' status-lembur';
+                                                        }
                                                     }
                                                 } else if (lowerValue.includes('izin')) {
                                                     className = 'status-izin';
+                                                    displayText = 'Izin';
                                                 } else if (lowerValue.includes('alpha')) {
                                                     className = 'status-alpha';
+                                                    displayText = 'Alpha';
+                                                } else if (lowerValue.includes('cuti')) {
+                                                    className = 'status-izin';
+                                                    displayText = 'Cuti';
+                                                } else if (lowerValue.includes('libur')) {
+                                                    displayText = 'Libur';
+                                                } else if (lowerValue.includes('sakit')) {
+                                                    className = 'status-izin';
+                                                    displayText = 'Sakit';
                                                 }
                                                 
                                                 return `<td class="${className}">${displayText}</td>`;
