@@ -618,45 +618,28 @@
                                             ${dateColumns.map(col => {
                                                 if (col >= data.length) return '<td>-</td>';
                                                 
-                                                let cellValue = data[col].trim();
+                                                const cellValue = data[col].trim();
                                                 const lowerValue = cellValue.toLowerCase();
                                                 let className = '';
-                                                let displayText = cellValue;
                                                 
                                                 // Handle empty/blank values
                                                 if (cellValue === '' || cellValue === '-' || cellValue === ' ') {
                                                     return '<td>-</td>';
                                                 }
                                                 
-                                                // Standardize the data format according to database
+                                                // Tetapkan class status tanpa mengubah teks yang ditampilkan
                                                 if (lowerValue.includes('hadir')) {
                                                     className = 'status-hadir';
-                                                    // Format: "Hadir (Jam)" or "Hadir"
-                                                    displayText = 'Hadir';
                                                     if (lowerValue.includes('jam')) {
-                                                        const jamMatch = cellValue.match(/(\d+)/);
-                                                        if (jamMatch) {
-                                                            displayText = `Hadir (${jamMatch[0]} Jam)`;
-                                                            className += ' status-lembur';
-                                                        }
+                                                        className += ' status-lembur';
                                                     }
                                                 } else if (lowerValue.includes('izin')) {
                                                     className = 'status-izin';
-                                                    displayText = 'Izin';
                                                 } else if (lowerValue.includes('alpha')) {
                                                     className = 'status-alpha';
-                                                    displayText = 'Alpha';
-                                                } else if (lowerValue.includes('cuti')) {
-                                                    className = 'status-izin';
-                                                    displayText = 'Cuti';
-                                                } else if (lowerValue.includes('libur')) {
-                                                    displayText = 'Libur';
-                                                } else if (lowerValue.includes('sakit')) {
-                                                    className = 'status-izin';
-                                                    displayText = 'Sakit';
                                                 }
                                                 
-                                                return `<td class="${className}">${displayText}</td>`;
+                                                return `<td class="${className}">${cellValue}</td>`;
                                             }).join('')}
                                         </tr>
                                     </tbody>
