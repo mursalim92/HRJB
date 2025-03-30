@@ -13,6 +13,7 @@
             --secondary: #3498db; /* Bright sky blue */
             --accent: #2980b9;   /* Slightly darker sky blue */
             --danger: #e74c3c;
+            --MERAH:rgb(251, 82, 82);
             --warning: #f39c12;
             --light: #ecf0f1;
             --dark: #34495e;
@@ -493,7 +494,9 @@
                 
             </p>
             <p1 class="mining-subtitle">
-                SUNGAI DUA MINING PROJECT
+                <i class="fas fa-mountain truck-icon"></i> 
+                SUNGAI DUA MINING PROJECT 
+                <i class="fas fa-hammer truck-icon"></i>
             </p1>
         </div>
         
@@ -530,18 +533,18 @@
     
         // Warna background untuk kode tertentu
         const CODE_BG_COLORS = {
-            'A': 'rgb(251, 82, 82)', // MERAH
+            'A': '#FFD700', // Kuning
             'Out': '#FF6347', // Tomat
             'In': '#90EE90', // Light Green
-            'MUTASI': '#ADD8E6', // Light Blue
-            'LIBUR': '#FFA07A', // Light Salmon
+            'O': '#ADD8E6', // Light Blue
+            'L': '#FFA07A', // Light Salmon
             'R': '#D8BFD8', // Thistle
             'Off': '#D3D3D3', // Light Grey
             'FB': '#FFC0CB', // Pink
             'CT': '#98FB98', // Pale Green
             'IC': '#E6E6FA', // Lavender
             'ID': '#F0E68C', // Khaki
-            'SAKIT': '#B0E0E6', // Powder Blue
+            'SJ': '#B0E0E6', // Powder Blue
             'SI': '#FFDEAD', // Navajo White
             'SC': '#DA70D6', // Orchid
             'SR': '#87CEFA'  // Light Sky Blue
@@ -617,67 +620,82 @@
                 return result;
             });
         }
+
     
-        function createEmployeeCard(data, dateColumns, dateLabels) {
-            const nama = data[1] || '-';
-            const inisial = nama.split(" ").map(n => n[0]).join("").toUpperCase();
-            
-            return `
-                <div class="employee-card">
-                    <div class="employee-header">
-                        <div class="employee-avatar">${inisial}</div>
-                        <div class="employee-info">
-                            <h2>${nama}</h2>
-                            <div class="employee-meta">
-                                <div class="meta-item">
-                                    <i class="fas fa-id-badge"></i>
-                                    <span>${data[0]}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-briefcase"></i>
-                                    <span>${data[2] || '-'}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-hard-hat"></i>
-                                    <span>${data[3] || '-'}</span>
-                                </div>
+    function createEmployeeCard(data, dateColumns, dateLabels) {
+        const nama = data[1] || '-';
+        const inisial = nama.split(" ").map(n => n[0]).join("").toUpperCase();
+        
+        // Hitung jumlah overtime dari kolom AH (index 33)
+        const overtimeIndex = 33; // Kolom AH
+        const overtimeValue = data.length > overtimeIndex ? data[overtimeIndex].trim() : null;
+        const overtimeDisplay = overtimeValue && overtimeValue !== '' ? overtimeValue : 'NO OVT EVALUATION';
+        
+        return `
+            <div class="employee-card">
+                <div class="employee-header">
+                    <div class="employee-avatar">${inisial}</div>
+                    <div class="employee-info">
+                        <h2>${nama}</h2>
+                        <div class="employee-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-id-badge"></i>
+                                <span>${data[0]}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-briefcase"></i>
+                                <span>${data[2] || '-'}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-hard-hat"></i>
+                                <span>${data[3] || '-'}</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <div style="overflow-x: auto;">
-                        <table class="attendance-table">
-                            <thead>
-                                <tr>${dateLabels.map(label => `<th>${label}</th>`).join('')}</tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    ${dateColumns.map(col => {
-                                        const cellValue = data[col] ? data[col].trim() : '';
-                                        if (!cellValue || cellValue === '-' || cellValue === ' ') {
-                                            return '<td>-</td>';
-                                        }
-                                        
-                                        // Cek apakah kode termasuk yang harus berfont merah
-                                        const isRedFont = RED_FONT_CODES.includes(cellValue);
-                                        
-                                        // Cek warna background berdasarkan kode
-                                        const bgColor = CODE_BG_COLORS[cellValue] || '';
-                                        
-                                        // Buat style
-                                        let style = '';
-                                        if (isRedFont) style += 'color: red;';
-                                        if (bgColor) style += `background-color: ${bgColor};`;
-                                        
-                                        return `<td style="${style}">${cellValue}</td>`;
-                                    }).join('')}
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
-            `;
-        }
+                
+                <!-- Tambah info overtime di sini -->
+                <div class="overtime-info" style="
+                    margin: 15px 0;
+                    padding: 10px;
+                    background: #f8f9fa;
+                    border-radius: 5px;
+                    font-weight: bold;
+                    text-align: center;
+                    border-left: 4px solid var(--accent);
+                ">
+                    <i class="fas fa-clock" style="margin-right: 5px;"></i>
+                    Jumlah Overtime: ${overtimeDisplay}
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>${dateLabels.map(label => `<th>${label}</th>`).join('')}</tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                ${dateColumns.map(col => {
+                                    const cellValue = data[col] ? data[col].trim() : '';
+                                    if (!cellValue || cellValue === '-' || cellValue === ' ') {
+                                        return '<td>-</td>';
+                                    }
+                                    
+                                    const isRedFont = RED_FONT_CODES.includes(cellValue);
+                                    const bgColor = CODE_BG_COLORS[cellValue] || '';
+                                    let style = '';
+                                    if (isRedFont) style += 'color: red;';
+                                    if (bgColor) style += `background-color: ${bgColor};`;
+                                    
+                                    return `<td style="${style}">${cellValue}</td>`;
+                                }).join('')}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
         
         function showError(message) {
             document.getElementById("resultContainer").innerHTML = `
