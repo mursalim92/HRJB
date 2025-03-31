@@ -587,12 +587,70 @@
             </div>
         </div>
     </div>
-
+    <!-- Popup Definisi -->
+    <div class="popup-overlay" id="definitionPopup">
+        <div class="popup-content">
+            <span class="popup-close" onclick="closePopup()">&times;</span>
+            <h3 class="popup-title" id="popupCode">KODE</h3>
+            <div class="popup-definition" id="popupDefinition">
+                Definisi akan muncul di sini
+            </div>
+        </div>
+    </div>
+    <!-- ---------<!-- akhir Popup Definisi -->--------------- -->
     <div class="footer-signature">
         <i class="fas fa-hard-hat"></i> Mursalim Andi K - 2025
     </div>
 
     <script>
+
+        // Database Kode Absensi
+    const CODE_DEFINITIONS = {
+        // Shift Siang
+        'S': '12 Jam kerja (06.00-18.00) Shift Siang',
+        'S11': '12 Jam kerja (06.00-18.00) Shift Siang TELAT<1 Jam',
+        'S10': '12 Jam kerja (06.00-18.00) Shift Siang TELAT<2 Jam',
+        'S9': '12 Jam kerja (06.00-18.00) Shift Siang TELAT<3 Jam',
+        'S8': '12 Jam kerja (06.00-18.00) Shift Siang TELAT<4 Jam/FP1X',
+        'ES': '12 Jam kerja (06.00-18.00) Shift Siang DAY 6',
+        'ES11': '12 Jam kerja (06.00-18.00) Shift Siang TELAT<1 Jam DAY 6',
+        'ES10': '12 Jam kerja (06.00-18.00) Shift Siang TELAT<2 Jam DAY 6',
+        'ES9': '12 Jam kerja (06.00-18.00) Shift Siang TELAT<3 Jam DAY 6',
+        'SPC': '12 Jam kerja (06.00-18.00) Shift Siang PULANG CEPAT <1 JAM',
+        'ESPC': '12 Jam kerja (06.00-18.00) Shift Siang PULANG CEPAT <1 JAM DAY 6',
+        
+        // Shift Malam
+        'M': '12 Jam kerja (18.00-06.00) Shift Malam',
+        'M11': '12 Jam kerja (18.00-06.00) Shift Malam TELAT<1 Jam',
+        'M10': '12 Jam kerja (18.00-06.00) Shift Malam TELAT<2 Jam',
+        'M9': '12 Jam kerja (18.00-06.00) Shift Malam TELAT<3 Jam',
+        'M8': '12 Jam kerja (18.00-06.00) Shift Malam TELAT<4 Jam/FP1X',
+        'EM': '12 Jam kerja (18.00-06.00) Shift Malam DAY 6',
+        'EM11': '12 Jam kerja (18.00-06.00) Shift Malam TELAT<1 Jam DAY 6',
+        'EM10': '12 Jam kerja (18.00-06.00) Shift Malam TELAT<2 Jam DAY 6',
+        'EM9': '12 Jam kerja (18.00-06.00) Shift Malam TELAT<3 Jam DAY 6',
+        'MPC': '12 Jam kerja (18.00-06.00) Shift Malam PULANG CEPAT <1 JAM',
+        'EMPC': '12 Jam kerja (18.00-06.00) Shift Malam PULANG CEPAT <1 JAM DAY 6',
+        
+        // Kode Khusus
+        'A': 'Mangkir Tanpa keterangan',
+        'OUT': 'Keluar/Resign/PHK',
+        'IN': 'Belum Menjadi Karyawan',
+        'O': 'Mutasi',
+        'L': 'Libur Perusahaan/Nasional',
+        'R': 'Skorsing',
+        'OFF': 'Hari Off Karyawan',
+        'FB': 'FieldBreak',
+        'CT': 'Cuti Tahunan',
+        'IC': 'Ijin Potong Cuti',
+        'ID': 'Ijin Dispensasi',
+        'SJ': 'Sakit Rawat Jalan',
+        'SI': 'Sakit Rawat Inap',
+        'SC': 'Sakit control Penyakit Berkepanjangan',
+        'SR': 'Dirumahkan/ Efisiensi'
+    };
+        //------------akhir Database Kode Absensi---------
+        
     // Daftar kode untuk font merah (tidak case sensitive)
     const RED_FONT_CODES = ['s11','s10','s9','s8','es11','es10','es9','spc','espc','m11','m10','m9','m8','em11','em10','em9','mpc','empc','sb10','sb9','esb10','esb9','sbpc','esbpc','mb10','mb9','emb10','emb9','mbpc','embpc','ps10','ps9','eps10','eps9','cps','pm9','epm9','cpm','os11','os10','os9','om11','om10','om9','osb11','osb10','osb9','omb11','omb10','omb9','hls11','hls10','hls9','hlspc','hlm11','hlm10','hlm9','hlmpc','hlsb10','hlsb9','hlsbpc','hlmb10','hlmb9','hlmbpc'];
     
@@ -617,6 +675,50 @@
         'sc': '#DA70D6', // Orchid
         'sr': '#87CEFA'  // Light Sky Blue
     };
+
+        // Fungsi untuk menampilkan popup
+    function showDefinition(code) {
+        const popup = document.getElementById('definitionPopup');
+        const popupCode = document.getElementById('popupCode');
+        const popupDefinition = document.getElementById('popupDefinition');
+
+        popupCode.textContent = code;
+        
+        // Handle angka (overtime)
+        if (!isNaN(code) && code !== '') {
+            popupDefinition.textContent = `Lembur selama ${code} jam`;
+        } 
+        // Handle kode yang dikenal
+        else if (CODE_DEFINITIONS[code.toUpperCase()]) {
+            popupDefinition.textContent = CODE_DEFINITIONS[code.toUpperCase()];
+        } 
+        // Handle kode tidak dikenali
+        else {
+            popupDefinition.textContent = 'Definisi tidak ditemukan';
+        }
+        
+        popup.classList.add('active');
+    }
+
+    // Fungsi tutup popup
+    function closePopup() {
+        document.getElementById('definitionPopup').classList.remove('active');
+    }
+
+    // Fungsi untuk attach event click ke sel tabel
+    function attachCellClickEvents() {
+        const cells = document.querySelectorAll('.attendance-table td');
+        cells.forEach(cell => {
+            cell.style.cursor = 'pointer';
+            cell.addEventListener('click', function() {
+                const code = this.textContent.trim();
+                if (code && code !== '-') {
+                    showDefinition(code);
+                }
+            });
+        });
+    }
+        
     
     async function loadData() {
         const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuJPtEwzwo9O3MjCKYYQBbz_rGkod8Bjm4G13B4BwhD3RlmdP2WwBXK9Smy0mrlfdNvJtDHFCi-P9Y/pub?output=csv";
@@ -697,6 +799,7 @@
         const overtimeIndex = 33; // Kolom AH
         const overtimeValue = data.length > overtimeIndex ? data[overtimeIndex].trim() : null;
         const overtimeDisplay = overtimeValue && overtimeValue !== '' ? overtimeValue : 'NO OVT EVALUATION';
+        setTimeout(attachCellClickEvents, 0);
         
         return `
             <div class="employee-card">
@@ -778,7 +881,12 @@
     document.getElementById("nikInput").addEventListener("keypress", e => {
         if (e.key === "Enter") loadData();
     });
-    
+
+    // Tutup popup ketika klik di luar area popup
+    document.getElementById('definitionPopup').addEventListener('click', function(e) {
+        if (e.target === this) closePopup();
+    });
+        
     if (window.innerWidth >= 992) {
         document.querySelector('.moving-truck').style.display = 'block';
     }
