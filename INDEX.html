@@ -56,17 +56,21 @@
         }
         
         .mining-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            color: white;
-            padding: 30px 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-            border: 3px solid var(--gold);
-        }
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: white;
+    padding: 50px 20px; /* Increased padding from 30px to 50px */
+    border-radius: 8px;
+    margin-bottom: 30px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    border: 3px solid var(--gold);
+    min-height: 300px; /* Added minimum height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
         
         .mining-header::before {
             content: '';
