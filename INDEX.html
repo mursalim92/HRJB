@@ -526,65 +526,190 @@
     </div>
 
     <script>
-        // Daftar kode untuk font merah (tidak peka huruf besar/kecil)
-        const RED_FONT_CODES = [
-            'S11','S10','S9','S8','ES11','ES10','ES9','SPC','ESPC','M11','M10','M9','M8','EM11','EM10','EM9','MPC','EMPC',
-            'SB10','SB9','ESB10','ESB9','SBPC','ESBPC','MB10','MB9','EMB10','EMB9','MBPC','EMBPC','PS10','PS9','EPS10','EPS9',
-            'CPS','PM9','EPM9','CPM','OS11','OS10','OS9','OM11','OM10','OM9','OSB11','OSB10','OSB9','OMB11','OMB10','OMB9',
-            'HLS11','HLS10','HLS9','HLSPC','HLM11','HLM10','HLM9','HLMPC','HLSB10','HLSB9','HLSBPC','HLMB10','HLMB9','HLMBPC'
-        ].map(code => code.toLowerCase());
+        // Daftar kode untuk font merah
+        const RED_FONT_CODES = ['S11','S10','S9','S8','ES11','ES10','ES9','SPC','ESPC','M11','M10','M9','M8','EM11','EM10','EM9','MPC','EMPC','SB10','SB9','ESB10','ESB9','SBPC','ESBPC','MB10','MB9','EMB10','EMB9','MBPC','EMBPC','PS10','PS9','EPS10','EPS9','CPS','PM9','EPM9','CPM','OS11','OS10','OS9','OM11','OM10','OM9','OSB11','OSB10','OSB9','OMB11','OMB10','OMB9','HLS11','HLS10','HLS9','HLSPC','HLM11','HLM10','HLM9','HLMPC','HLSB10','HLSB9','HLSBPC','HLMB10','HLMB9','HLMBPC'];
     
-        // Warna background untuk kode tertentu (tidak peka huruf besar/kecil)
+        // Warna background untuk kode tertentu
         const CODE_BG_COLORS = {
-            'a': '#FFD700',
-            'out': '#FF6347',
-            'in': '#90EE90',
-            'o': '#ADD8E6',
-            'l': '#FFA07A',
-            'r': '#D8BFD8',
-            'off': '#D3D3D3',
-            'fb': '#FFC0CB',
-            'ct': '#98FB98',
-            'ic': '#E6E6FA',
-            'id': '#F0E68C',
-            'sj': '#B0E0E6',
-            'si': '#FFDEAD',
-            'sc': '#DA70D6',
-            'sr': '#87CEFA'
+            'A': '#FFD700', // Kuning
+            'Out': '#FF6347', // Tomat
+            'In': '#90EE90', // Light Green
+            'O': '#ADD8E6', // Light Blue
+            'L': '#FFA07A', // Light Salmon
+            'R': '#D8BFD8', // Thistle
+            'OFF': '#D3D3D3', // Light Grey
+            'FB': '#FFC0CB', // Pink
+            'CT': '#98FB98', // Pale Green
+            'IC': '#E6E6FA', // Lavender
+            'ID': '#F0E68C', // Khaki
+            'SJ': '#B0E0E6', // Powder Blue
+            'SI': '#FFDEAD', // Navajo White
+            'SC': '#DA70D6', // Orchid
+            'SR': '#87CEFA'  // Light Sky Blue
         };
     
-        function createEmployeeCard(data, dateColumns, dateLabels) {
-            return `
-                <div class="employee-card">
-                    <div style="overflow-x: auto;">
-                        <table class="attendance-table">
-                            <thead>
-                                <tr>${dateLabels.map(label => `<th>${label}</th>`).join('')}</tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    ${dateColumns.map(col => {
-                                        const cellValue = data[col] ? data[col].trim() : '';
-                                        const lowerValue = cellValue.toLowerCase();
-                                        
-                                        if (!cellValue || cellValue === '-' || cellValue === ' ') {
-                                            return '<td>-</td>';
-                                        }
-                                        
-                                        const isRedFont = RED_FONT_CODES.includes(lowerValue);
-                                        const bgColor = CODE_BG_COLORS[lowerValue] || '';
-                                        let style = '';
-                                        if (isRedFont) style += 'color: red;';
-                                        if (bgColor) style += `background-color: ${bgColor};`;
-                                        
-                                        return `<td style="${style}">${cellValue}</td>`;
-                                    }).join('')}
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+        async function loadData() {
+            const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuJPtEwzwo9O3MjCKYYQBbz_rGkod8Bjm4G13B4BwhD3RlmdP2WwBXK9Smy0mrlfdNvJtDHFCi-P9Y/pub?output=csv";
+            const nik = document.getElementById("nikInput").value.trim();
+            const resultDiv = document.getElementById("resultContainer");
+            
+            if (!nik) {
+                showError("Silakan masukkan NIK karyawan");
+                return;
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Memuat data karyawan...</div>
                 </div>
             `;
+            
+            try {
+                const response = await fetch(SPREADSHEET_URL);
+                const csvData = await response.text();
+                const rows = parseCSV(csvData);
+                const header = rows[0];
+    
+                // Proses kolom tanggal
+                const dateColumns = [];
+                const dateLabels = [];
+                
+                for (let i = 4; i < header.length; i++) {
+                    if (header[i].match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                        dateColumns.push(i);
+                        const [day, month] = header[i].split('/');
+                        dateLabels.push(`${day}/${month}`);
+                    }
+                }
+    
+                // Cari data karyawan
+                const karyawan = rows.find(row => row[0].trim() === nik);
+                
+                if (karyawan) {
+                    resultDiv.innerHTML = createEmployeeCard(karyawan, dateColumns, dateLabels);
+                } else {
+                    showError("Data karyawan tidak ditemukan");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                showError(`Terjadi kesalahan: ${error.message}`);
+            }
+        }
+    
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            return lines.map(line => {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let char of line) {
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current);
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current);
+                return result;
+            });
+        }
+
+    
+    function createEmployeeCard(data, dateColumns, dateLabels) {
+        const nama = data[1] || '-';
+        const inisial = nama.split(" ").map(n => n[0]).join("").toUpperCase();
+        
+        // Hitung jumlah overtime dari kolom AH (index 33)
+        const overtimeIndex = 33; // Kolom AH
+        const overtimeValue = data.length > overtimeIndex ? data[overtimeIndex].trim() : null;
+        const overtimeDisplay = overtimeValue && overtimeValue !== '' ? overtimeValue : 'NO OVT EVALUATION';
+        
+        return `
+            <div class="employee-card">
+                <div class="employee-header">
+                    <div class="employee-avatar">${inisial}</div>
+                    <div class="employee-info">
+                        <h2>${nama}</h2>
+                        <div class="employee-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-id-badge"></i>
+                                <span>${data[0]}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-briefcase"></i>
+                                <span>${data[2] || '-'}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-hard-hat"></i>
+                                <span>${data[3] || '-'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tambah info overtime di sini -->
+                <div class="overtime-info" style="
+                    margin: 15px 0;
+                    padding: 10px;
+                    background: #f8f9fa;
+                    border-radius: 5px;
+                    font-weight: bold;
+                    text-align: center;
+                    border-left: 4px solid var(--accent);
+                ">
+                    <i class="fas fa-clock" style="margin-right: 5px;"></i>
+                    Jumlah Overtime: ${overtimeDisplay}
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>${dateLabels.map(label => `<th>${label}</th>`).join('')}</tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                ${dateColumns.map(col => {
+                                    const cellValue = data[col] ? data[col].trim() : '';
+                                    if (!cellValue || cellValue === '-' || cellValue === ' ') {
+                                        return '<td>-</td>';
+                                    }
+                                    
+                                    const isRedFont = RED_FONT_CODES.includes(cellValue);
+                                    const bgColor = CODE_BG_COLORS[cellValue] || '';
+                                    let style = '';
+                                    if (isRedFont) style += 'color: red;';
+                                    if (bgColor) style += `background-color: ${bgColor};`;
+                                    
+                                    return `<td style="${style}">${cellValue}</td>`;
+                                }).join('')}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+        
+        function showError(message) {
+            document.getElementById("resultContainer").innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+        
+        document.getElementById("nikInput").addEventListener("keypress", e => {
+            if (e.key === "Enter") loadData();
+        });
+        
+        if (window.innerWidth >= 992) {
+            document.querySelector('.moving-truck').style.display = 'block';
         }
     </script>
     
