@@ -467,6 +467,73 @@
                 bottom: 10px;
             }
         }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .popup-overlay.active .popup-content {
+            transform: translateY(0);
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .popup-title {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 8px;
+        }
+
+        .popup-definition {
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .popup-content {
+                padding: 20px 15px;
+            }
+            .popup-title {
+                font-size: 18px;
+            }
+        }
         
         @media (min-width: 992px) {
             .moving-truck {
