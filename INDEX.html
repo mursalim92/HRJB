@@ -156,6 +156,7 @@
             padding: var(--space-lg);
             position: relative;
             border: 1px solid var(--light);
+            overflow: hidden; /* Tambahkan ini */
         }
 
         /* Header */
@@ -283,6 +284,8 @@
             margin-bottom: var(--space-md);
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--light);
+            width: 100%;
+            overflow: hidden;
         }
 
         .employee-avatar {
@@ -299,29 +302,41 @@
             border: 2px solid var(--gold);
         }
 
+        /* Container Tabel */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: var(--space-md);
+            border: 1px solid var(--light);
+            border-radius: var(--radius-md);
+        }
+
         /* Tabel */
         .attendance-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: var(--space-md);
-            font-size: 0.625rem;
-            box-shadow: var(--shadow-sm);
+            font-size: 0.7rem;
+            min-width: 800px; /* Minimum width untuk memastikan tabel tidak terlalu sempit */
         }
 
         .attendance-table th {
             background-color: var(--accent);
             color: white;
-            padding: var(--space-sm);
+            padding: 10px 6px;
             text-align: center;
             border: 1px solid var(--primary);
+            position: sticky;
+            top: 0;
         }
 
         .attendance-table td {
-            padding: var(--space-sm);
+            padding: 8px 5px;
             text-align: center;
             border-bottom: 1px solid var(--light);
             border-right: 1px solid var(--light);
             cursor: pointer;
+            min-width: 40px;
         }
 
         .attendance-table tr:nth-child(even) {
@@ -484,9 +499,13 @@
             }
             
             .attendance-table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
+                font-size: 0.6rem;
+            }
+            
+            .attendance-table th,
+            .attendance-table td {
+                padding: 6px 3px;
+                min-width: 35px;
             }
             
             .footer-signature {
@@ -861,7 +880,7 @@
                         Jumlah Overtime: ${overtimeDisplay}
                     </div>
                     
-                    <div class="overflow-x-auto">
+                    <div class="table-responsive">
                         <table class="attendance-table">
                             <thead>
                                 <tr>${dateLabels.map(label => `<th>${label}</th>`).join('')}</tr>
