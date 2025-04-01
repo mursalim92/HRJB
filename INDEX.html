@@ -523,6 +523,7 @@
             box-shadow: var(--shadow-sm);
             font-style: italic;
             border: 1px solid var(--light);
+            z-index: 1000; /* update */
         }
 
         /* Popup */
@@ -620,6 +621,40 @@
                 padding: 6px 3px;
                 min-width: 35px;
             }
+
+            /* Running Text / Marquee */
+                .marquee-container {
+                    background: linear-gradient(90deg, var(--primary), var(--accent));
+                    color: white;
+                    padding: 10px 0;
+                    overflow: hidden;
+                    border-radius: var(--radius-md);
+                    margin-top: var(--space-md);
+                }
+                
+                .marquee-content {
+                    display: flex;
+                    white-space: nowrap;
+                    animation: scrollMarquee 25s linear infinite;
+                }
+                
+                .marquee-content span {
+                    display: inline-block;
+                    padding-right: 50px;
+                    font-family: 'Bebas Neue', sans-serif;
+                    letter-spacing: 1px;
+                    font-size: 1.1rem;
+                }
+                
+                .marquee-content i {
+                    margin: 0 8px;
+                    color: var(--gold);
+                }
+                
+                @keyframes scrollMarquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                }
             
             .footer-signature {
                 position: static;
@@ -667,6 +702,46 @@
                 <i class="fas fa-search mb-sm text-4xl"></i>
                 <h3 class="text-bold mb-xs">Masukkan NIK Karyawan</h3>
                 <p>Data absensi akan muncul di sini</p>
+            </div>
+        </div>
+        <!-- running text -->
+          <div class="marquee-content">
+            <span>
+              <i class="fas fa-bullhorn"></i> PT JHONLIN BARATAMA - SUNGAI DUA MINING PROJECT - HUMAN RESOURCES SYSTEM - 
+              <i class="fas fa-calendar-check"></i> Sistem Absensi Karyawan - 
+              <i class="fas fa-users"></i> Total Karyawan: 250+ - 
+              <i class="fas fa-hard-hat"></i> Safety First - 
+              <i class="fas fa-award"></i> Perusahaan Terbaik 2024
+            </span>
+            <span>
+              <i class="fas fa-bullhorn"></i> PT JHONLIN BARATAMA - SUNGAI DUA MINING PROJECT - HUMAN RESOURCES SYSTEM - 
+              <i class="fas fa-calendar-check"></i> Sistem Absensi Karyawan - 
+              <i class="fas fa-users"></i> Total Karyawan: 250+ - 
+              <i class="fas fa-hard-hat"></i> Safety First - 
+              <i class="fas fa-award"></i> Perusahaan Terbaik 2024
+            </span>
+          </div>
+        </div>
+       
+        </style>
+        <!-- running text -->
+
+        <div class="marquee-container">
+            <div class="marquee-content">
+                <span>
+                    <i class="fas fa-bullhorn"></i> PT JHONLIN BARATAMA - SUNGAI DUA MINING PROJECT - HUMAN RESOURCES SYSTEM - 
+                    <i class="fas fa-calendar-check"></i> Sistem Absensi Karyawan - 
+                    <i class="fas fa-users"></i> Total Karyawan: 250+ - 
+                    <i class="fas fa-hard-hat"></i> Safety First - 
+                    <i class="fas fa-award"></i> Perusahaan Terbaik 2024
+                </span>
+                <span>
+                    <i class="fas fa-bullhorn"></i> PT JHONLIN BARATAMA - SUNGAI DUA MINING PROJECT - HUMAN RESOURCES SYSTEM - 
+                    <i class="fas fa-calendar-check"></i> Sistem Absensi Karyawan - 
+                    <i class="fas fa-users"></i> Total Karyawan: 250+ - 
+                    <i class="fas fa-hard-hat"></i> Safety First - 
+                    <i class="fas fa-award"></i> Perusahaan Terbaik 2024
+                </span>
             </div>
         </div>
     </div>
@@ -1049,69 +1124,6 @@
         }
     </script>
 
-    <!-- runnning text->
-        <div class="footer-marquee">
-          <div class="marquee-content">
-            <span>
-              <i class="fas fa-bullhorn"></i> PT JHONLIN BARATAMA - SUNGAI DUA MINING PROJECT - HUMAN RESOURCES SYSTEM - 
-              <i class="fas fa-calendar-check"></i> Sistem Absensi Karyawan - 
-              <i class="fas fa-users"></i> Total Karyawan: 250+ - 
-              <i class="fas fa-hard-hat"></i> Safety First - 
-              <i class="fas fa-award"></i> Perusahaan Terbaik 2024
-            </span>
-            <span>
-              <i class="fas fa-bullhorn"></i> PT JHONLIN BARATAMA - SUNGAI DUA MINING PROJECT - HUMAN RESOURCES SYSTEM - 
-              <i class="fas fa-calendar-check"></i> Sistem Absensi Karyawan - 
-              <i class="fas fa-users"></i> Total Karyawan: 250+ - 
-              <i class="fas fa-hard-hat"></i> Safety First - 
-              <i class="fas fa-award"></i> Perusahaan Terbaik 2024
-            </span>
-          </div>
-        </div>
-        
-        <style>
-          /* Add this to your CSS */
-          .footer-marquee {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            color: white;
-            padding: 10px 0;
-            z-index: 100;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-          }
-          
-          .marquee-content {
-            display: flex;
-            white-space: nowrap;
-            animation: scrollMarquee 25s linear infinite;
-          }
-          
-          .marquee-content span {
-            display: inline-block;
-            padding-right: 50px;
-            font-family: 'Bebas Neue', sans-serif;
-            letter-spacing: 1px;
-            font-size: 1.1rem;
-          }
-          
-          .marquee-content i {
-            margin: 0 8px;
-            color: var(--gold);
-          }
-          
-          @keyframes scrollMarquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-          
-          /* Adjust footer signature position */
-          .footer-signature {
-            bottom: 40px; /* Raise it above the marquee */
-          }
-        </style>
+    
 </body>
 </html>
