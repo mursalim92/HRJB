@@ -411,6 +411,18 @@
   border-radius: 50%;
   animation: spin-counterclockwise 2s linear infinite;
 }
+        .outer-circle::before {
+  content: '';
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  top: -10%;
+  left: -10%;
+  border: 4px dashed var(--gold);
+  border-radius: 50%;
+  animation: spin-clockwise 3s linear infinite;
+  opacity: 0.6;
+}
 
 @keyframes spin-clockwise {
   0% { transform: rotate(0deg); }
