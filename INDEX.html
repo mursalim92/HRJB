@@ -423,6 +423,15 @@
   animation: spin-clockwise 3s linear infinite;
   opacity: 0.6;
 }
+        animation: 
+    spin-counterclockwise 2s linear infinite,
+    pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.7; transform: rotate(0deg) scale(0.95); }
+  100% { opacity: 1; transform: rotate(-360deg) scale(1.05); }
+}
 
 @keyframes spin-clockwise {
   0% { transform: rotate(0deg); }
@@ -888,7 +897,7 @@
                     </div>
                     <div class="outer-circle"></div>
                   </div>
-                  <div class="loading-text">Memuat data karyawan...</div>
+                  <div class="loading-text">Memuat data ...</div>
                 </div>
             `;
             
