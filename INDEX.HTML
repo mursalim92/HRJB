@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Nomor Surat HRD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <img src="https://via.placeholder.com/80" class="rounded-circle" alt="Company Logo">
+                        <h5 class="text-white mt-2">HRD Portal</h5>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                <i class="bi bi-file-earmark-text me-2"></i>Manajemen Surat
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-archive me-2"></i>Arsip Surat
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-gear me-2"></i>Pengaturan
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Manajemen Nomor Surat HRD</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLetterModal">
+                            <i class="bi bi-plus-circle me-1"></i>Buat Surat Baru
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form id="filterForm">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="filterHRD" class="form-label">Nama HRD</label>
+                                    <select class="form-select" id="filterHRD">
+                                        <option value="">Semua</option>
+                                        <option value="Mursalim">Mursalim</option>
+                                        <option value="Gerard Febrino A">Gerard Febrino A</option>
+                                        <option value="M. Fauzan Abrar">M. Fauzan Abrar</option>
+                                        <option value="M. Mohan P">M. Mohan P</option>
+                                        <option value="M. Rizky Giyan">M. Rizky Giyan</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="filterJenis" class="form-label">Jenis Surat</label>
+                                    <select class="form-select" id="filterJenis">
+                                        <option value="">Semua</option>
+                                        <option value="Surat Keterangan Kerja">Surat Keterangan Kerja</option>
+                                        <option value="Surat Pengalaman Kerja">Surat Pengalaman Kerja</option>
+                                        <option value="Surat Dinas">Surat Dinas</option>
+                                        <option value="Surat Tugas">Surat Tugas</option>
+                                        <option value="Surat Peringatan">Surat Peringatan</option>
+                                        <option value="Surat Panggilan">Surat Panggilan</option>
+                                        <option value="Surat Mutasi">Surat Mutasi</option>
+                                        <option value="Rotasi Demosi">Rotasi Demosi</option>
+                                        <option value="PHK">PHK</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="filterDate" class="form-label">Tanggal</label>
+                                    <input type="date" class="form-control" id="filterDate">
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-funnel me-1"></i>Filter
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Letters Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th width="5%">No.</th>
+                                        <th width="15%">Nama HRD</th>
+                                        <th width="10%">Tanggal Surat</th>
+                                        <th width="15%">Jenis Surat</th>
+                                        <th width="20%">Nama Tersurat</th>
+                                        <th width="20%">Keterangan</th>
+                                        <th width="15%">Nomor Surat</th>
+                                        <th width="10%">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lettersTable">
+                                    <!-- Data akan diisi oleh JavaScript -->
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Mursalim</td>
+                                        <td>15/07/2023</td>
+                                        <td>Surat Keterangan Kerja</td>
+                                        <td>Budi Santoso</td>
+                                        <td>Karyawan tetap bagian produksi</td>
+                                        <td>HRD/001/SKK/VII/2023</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <!-- Contoh data lainnya -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <nav aria-label="Page navigation" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add Letter Modal -->
+    <div class="modal fade" id="addLetterModal" tabindex="-1" aria-labelledby="addLetterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addLetterModalLabel">Buat Surat Baru</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="letterForm">
+                    <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="hrdName" class="form-label">Nama HRD</label>
+                                <select class="form-select" id="hrdName" required>
+                                    <option value="">Pilih HRD</option>
+                                    <option value="Mursalim">Mursalim</option>
+                                    <option value="Gerard Febrino A">Gerard Febrino A</option>
+                                    <option value="M. Fauzan Abrar">M. Fauzan Abrar</option>
+                                    <option value="M. Mohan P">M. Mohan P</option>
+                                    <option value="M. Rizky Giyan">M. Rizky Giyan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="letterDate" class="form-label">Tanggal Surat</label>
+                                <input type="date" class="form-control" id="letterDate" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="letterType" class="form-label">Jenis Surat</label>
+                                <select class="form-select" id="letterType" required>
+                                    <option value="">Pilih Jenis Surat</option>
+                                    <option value="Surat Keterangan Kerja">Surat Keterangan Kerja</option>
+                                    <option value="Surat Pengalaman Kerja">Surat Pengalaman Kerja</option>
+                                    <option value="Surat Dinas">Surat Dinas</option>
+                                    <option value="Surat Tugas">Surat Tugas</option>
+                                    <option value="Surat Peringatan">Surat Peringatan</option>
+                                    <option value="Surat Panggilan">Surat Panggilan</option>
+                                    <option value="Surat Mutasi">Surat Mutasi</option>
+                                    <option value="Rotasi Demosi">Rotasi Demosi</option>
+                                    <option value="PHK">PHK</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="recipientName" class="form-label">Nama Tersurat</label>
+                                <input type="text" class="form-control" id="recipientName" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="letterNotes" class="form-label">Keterangan</label>
+                            <textarea class="form-control" id="letterNotes" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="letterNumber" class="form-label">Nomor Surat</label>
+                            <input type="text" class="form-control" id="letterNumber" readonly>
+                            <small class="text-muted">Nomor surat akan di-generate otomatis</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan Surat</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
